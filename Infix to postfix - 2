@@ -1,0 +1,101 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define SIZE 50
+
+char Expr[] = {
+    'K', '+', 'L', '-', 'M', '*', 'N', '+',
+    '(', 'O', '^', 'P', ')', '*', 'W', '/',
+    'U', '/', 'V', '*', 'T', '+', 'Q'
+};
+
+char Stack[SIZE];
+int Top = -1;
+int m = 0;
+int l = sizeof(Expr) / sizeof(Expr[0]);  // Automatically get length
+
+void push(char ch);
+void pop();
+void infix_to_postfix();
+
+void main() {
+    printf("Infix Expression: K+L-M*N+(O^P)*W/U/V*T+Q\n");
+    printf("Postfix Expression: ");
+    infix_to_postfix();
+    printf("\n");
+}
+
+void push(char ch) {
+    if (Top + 1 >= SIZE) {
+        printf("\nStack is full");
+    } else {
+        Stack[++Top] = ch;
+    }
+}
+
+void pop() {
+    if (Top < 0) {
+        printf("\nStack is empty");
+    } else {
+        if (Stack[Top] != '(')
+            printf("%c", Stack[Top]);
+        Top--;
+    }
+}
+
+void infix_to_postfix() {
+    m = 0;
+    while (m < l) {
+        switch (Expr[m]) {
+            case '+':
+            case '-':
+                while ((Stack[Top] == '-' || Stack[Top] == '+' || Stack[Top] == '*' ||
+                        Stack[Top] == '/' || Stack[Top] == '^') &&
+                       Stack[Top] != '(')
+                    pop();
+                push(Expr[m]);
+                m++;
+                break;
+
+            case '*':
+            case '/':
+                while ((Stack[Top] == '*' || Stack[Top] == '/' || Stack[Top] == '^') &&
+                       Stack[Top] != '(')
+                    pop();
+                push(Expr[m]);
+                m++;
+                break;
+
+            case '^':
+                push(Expr[m]);
+                m++;
+                break;
+
+            case '(':
+                push(Expr[m]);
+                m++;
+                break;
+
+            case ')':
+                while (Stack[Top] != '(')
+                    pop();
+                Top--;  // Remove '('
+                m++;
+                break;
+
+            default:
+                printf("%c", Expr[m]);
+                m++;
+                break;
+        }
+    }
+    while (Top >= 0)
+        pop();
+}
+
+
+
+
+OUTPUT:
+Infix Expression: K+L-M*N+(O^P)*W/U/V*T+Q
+Postfix Expression: KL+MN*-OP^W*U/V/T*+Q+
+
