@@ -1,0 +1,98 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define SIZE 20
+
+char Expr[] = {'A', '-', 'B', '/', 'C', '*', 'D', '+', 'E'};  
+char Stack[SIZE];
+int Top = -1;
+int m = 0, l = 9;  
+
+void push(char ch);
+void pop();
+void infix_to_postfix();
+
+void main() {
+    printf("Infix Expression: A-B/C*D+E\n");
+    printf("Postfix Expression: ");
+    infix_to_postfix();
+    printf("\n");
+}
+
+void push(char ch) {
+    if (Top + 1 >= SIZE) {
+        printf("\nStack is full");
+    } else {
+        Stack[++Top] = ch;
+    }
+}
+
+void pop() {
+    if (Top < 0) {
+        printf("\nStack is empty");
+    } else {
+        if (Stack[Top] != '(')
+            printf("%c", Stack[Top]);
+        Top--;
+    }
+}
+
+void infix_to_postfix() {
+    m = 0;
+    while (m < l) {
+        switch (Expr[m]) {
+            case '+':
+            case '-':
+                while ((Stack[Top] == '-' || Stack[Top] == '+' || Stack[Top] == '*' ||
+                        Stack[Top] == '/' || Stack[Top] == '^') &&
+                       Stack[Top] != '(')
+                    pop();
+                push(Expr[m]);
+                m++;
+                break;
+
+            case '*':
+            case '/':
+                while ((Stack[Top] == '*' || Stack[Top] == '/' || Stack[Top] == '^') &&
+                       Stack[Top] != '(')
+                    pop();
+                push(Expr[m]);
+                m++;
+                break;
+
+            case '^':
+                push(Expr[m]);
+                m++;
+                break;
+
+            case '(':
+                push(Expr[m]);
+                m++;
+                break;
+
+            case ')':
+                while (Stack[Top] != '(')
+                    pop();
+                Top--;  // remove '('
+                m++;
+                break;
+
+            default:
+                if (Expr[m] >= 'A' && Expr[m] <= 'Z') {
+                    printf("%c", Expr[m]);
+                    m++;
+                } else {
+                    printf("\nInvalid character in expression");
+                    exit(0);
+                }
+        }
+    }
+    while (Top >= 0)
+        pop();
+}
+
+
+
+
+OUTPUT:
+Infix Expression: A-B/C*D+E
+Postfix Expression: ABC/D*-E+
